@@ -1,65 +1,48 @@
-import AdBanner from "@/components/AdBanner";
 import HeroImage from "@/components/HeroImage";
-import FeatureGrid from "@/components/FeatureGrid";
 
 /*
- * Home page.
+ * Home page — dominant problem: LCP.
  *
- * Composition of:
- *  - AdBanner   -> CWV-ISSUE[CLS] (client-injected, no reserved space)
- *  - HeroImage  -> CWV-ISSUE[LCP] (heavy plain <img>, not next/image, no priority)
- *  - FeatureGrid-> CWV-ISSUE[TBT] (needless "use client" on static content)
- * The blocking font + blocking head script live in app/layout.tsx.
+ * The single intentional issue on this route is the heavy, unoptimized hero
+ * <img> (see HeroImage). Everything else here is plain, well-behaved content.
  */
 export default function Home() {
   return (
-    <>
-      {/* Layout-shifting banner that arrives after mount. */}
-      <AdBanner />
+    <main>
+      <HeroImage />
 
-      <main>
-        <HeroImage />
-
-        <section className="section">
-          <h2>Why NorthPeak</h2>
-          <p className="lead" style={{ marginBottom: "2rem" }}>
-            We make a small number of things, and we make them to last a lifetime
-            of hard use.
-          </p>
-          <FeatureGrid />
-        </section>
-
-        <section className="section">
-          <h2>From the field journal</h2>
-          <p className="lead">
-            Trip reports, gear notes, and route betas from the NorthPeak team and
-            our ambassadors. Updated whenever we get back to signal.
-          </p>
-          <div className="grid" style={{ marginTop: "1.5rem" }}>
-            <article className="card">
-              <h3>Traversing the Glacier Pass</h3>
-              <p className="muted">
-                Three days, two storms, and one very good thermos. A trip report
-                from our spring shakedown on the high route.
-              </p>
-            </article>
-            <article className="card">
-              <h3>Packing for shoulder season</h3>
-              <p className="muted">
-                The layering system we reach for when the forecast can&apos;t make
-                up its mind between summer and winter.
-              </p>
-            </article>
-            <article className="card">
-              <h3>Repair log: 2,000 km pack</h3>
-              <p className="muted">
-                What actually wears out after two thousand kilometres on the
-                trail, and what we changed in the next production run.
-              </p>
-            </article>
-          </div>
-        </section>
-      </main>
-    </>
+      <section className="section">
+        <h2>Why NorthPeak</h2>
+        <p className="lead" style={{ marginBottom: "2rem" }}>
+          We make a small number of things, and we make them to last a lifetime
+          of hard use. From repair-forever hardshells to packs that survive
+          two-thousand-kilometre seasons, every item earns its place in the
+          catalogue.
+        </p>
+        <div className="grid">
+          <article className="card">
+            <h3>Field-tested durability</h3>
+            <p className="muted">
+              Every pack and shell is abused on real expeditions before it
+              ships. If it fails on the mountain, it never reaches the store.
+            </p>
+          </article>
+          <article className="card">
+            <h3>Repair, don&apos;t replace</h3>
+            <p className="muted">
+              Lifetime repairs on all hardgoods. Send it back, we fix it, you
+              keep climbing. Less waste, more summits.
+            </p>
+          </article>
+          <article className="card">
+            <h3>Built by alpinists</h3>
+            <p className="muted">
+              Our design team has summited on six continents. The gear reflects
+              decades of hard-won mistakes.
+            </p>
+          </article>
+        </div>
+      </section>
+    </main>
   );
 }

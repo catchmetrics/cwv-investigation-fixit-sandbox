@@ -6,9 +6,15 @@ React 19, and TypeScript.
 
 ## Pages
 
-- `/` — Home (hero, brand story, field journal)
-- `/gallery` — Trip photo gallery
-- `/dashboard` — Trip planner (difficulty estimator + trail search)
+- `/` — Home (hero)
+- `/lookbook` — Trip photo gallery
+- `/deals` — Seasonal deals and promos
+- `/trail-finder` — Search the trail catalogue
+- `/pack-calculator` — Base-weight calculator
+- `/reviews` — Customer reviews
+- `/gear-guide` — Gear catalogue by category
+- `/story` — Our story
+- `/journal` — Field journal
 - `/about` — About the company
 
 ## Getting started

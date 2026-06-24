@@ -1,17 +1,6 @@
 "use client";
 
 import { useState } from "react";
-// CWV-ISSUE[TBT]: The entire lodash library is imported with a default import
-// (`import _ from "lodash"`) and bundled into the client. lodash is a large
-// dependency (~70 KB min+gzip for the whole thing) and only `_.deburr`,
-// `_.sortBy`, and `_.take` are used here — all of which have small native
-// equivalents. Shipping all of lodash inflates the client JS bundle and adds
-// parse/compile cost, raising Total Blocking Time.
-// CWV-FIX: drop lodash in favour of native JS (String.normalize, Array.sort,
-// Array.slice), or import only the specific functions (e.g.
-// `import sortBy from "lodash/sortBy"`) / use a dynamic import so it is not in
-// the critical bundle.
-import _ from "lodash";
 
 // Build a large in-memory catalogue once at module load.
 const TRAILS = Array.from({ length: 20_000 }, (_unused, i) => {
@@ -35,27 +24,37 @@ const TRAILS = Array.from({ length: 20_000 }, (_unused, i) => {
 });
 
 /*
- * SlowFilterList — a search box over 20,000 trails.
+ * TrailFinder — a search box over 20,000 trails.
  *
  * CWV-ISSUE[INP]: The filter recomputes synchronously on EVERY keystroke. There
  * is no debounce, no useMemo, and no virtualization, so each character typed
- * scans and sorts all 20,000 items (via lodash) and re-renders the whole result
- * list on the main thread. This produces a Long Animation Frame per keystroke
- * and a poor Interaction to Next Paint while typing.
+ * normalizes, scans, and sorts all 20,000 items with plain native JS and
+ * re-renders the whole result list on the main thread. This produces a Long
+ * Animation Frame per keystroke and a poor Interaction to Next Paint while
+ * typing. (Deliberately native JS only — no lodash — so this page's single
+ * problem is purely the un-debounced/un-memoized work, not bundle size.)
  * CWV-FIX: debounce the input (e.g. 200ms), memoize the filtered/sorted result
  * with useMemo keyed on the debounced query, cap/virtualize the rendered rows,
  * and avoid re-sorting the full dataset on every keystroke.
  */
-export default function SlowFilterList() {
+// Strip diacritics with native JS (the lodash-free equivalent of _.deburr).
+const COMBINING_MARKS = /[̀-ͯ]/g;
+function deburr(value: string): string {
+  return value.normalize("NFD").replace(COMBINING_MARKS, "");
+}
+
+export default function TrailFinder() {
   const [query, setQuery] = useState("");
 
-  // Recomputed on every render (every keystroke), no memoization.
-  const normalizedQuery = _.deburr(query.trim().toLowerCase());
+  // Recomputed on every render (every keystroke), no memoization, native JS.
+  const normalizedQuery = deburr(query.trim().toLowerCase());
   const matches = TRAILS.filter((t) =>
-    _.deburr(t.name.toLowerCase()).includes(normalizedQuery)
+    deburr(t.name.toLowerCase()).includes(normalizedQuery)
   );
-  const sorted = _.sortBy(matches, ["distanceKm", "name"]);
-  const visible = _.take(sorted, 100);
+  const sorted = [...matches].sort(
+    (a, b) => a.distanceKm - b.distanceKm || a.name.localeCompare(b.name)
+  );
+  const visible = sorted.slice(0, 100);
 
   return (
     <div className="card">

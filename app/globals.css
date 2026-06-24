@@ -31,11 +31,9 @@ body {
   min-height: 100vh;
   color: var(--foreground);
   background: var(--background);
-  /* CWV-ISSUE[CLS]: The site relies on a remote web font (see layout.tsx) whose
-     swap reflows this body text once it loads. Local fallback differs in metrics.
-     CWV-FIX: use next/font (self-hosted, size-adjusted) or font-display:swap with a
-     metric-matched fallback to avoid layout shift on font swap. */
-  font-family: "Source Serif Pro", Georgia, "Times New Roman", serif;
+  /* Clean, system-font default. The shared layout has no intentional CWV problem;
+     the blocking remote web font lives only on the /journal route. */
+  font-family: Georgia, "Times New Roman", serif;
   line-height: 1.55;
   -webkit-font-smoothing: antialiased;
 }

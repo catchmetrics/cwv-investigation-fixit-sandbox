@@ -3,23 +3,23 @@
 import { useState } from "react";
 
 /*
- * HeavyButton — an "Estimate trip difficulty" button that does heavy work.
+ * PackCalculator — a "Calculate pack load" button that does heavy work.
  *
- * CWV-ISSUE[INP]: The onClick handler runs a ~300,000,000-iteration synchronous
- * loop on the main thread. While it runs, the browser cannot respond to any
- * input, render frames, or fire events — producing a single Long Animation Frame
- * (LoAF) of several hundred milliseconds and a terrible Interaction to Next
- * Paint (INP) for this interaction.
+ * CWV-ISSUE[INP][LoAF]: The onClick handler runs a ~300,000,000-iteration
+ * synchronous loop on the main thread. While it runs, the browser cannot respond
+ * to any input, render frames, or fire events — producing a single Long
+ * Animation Frame (LoAF) of several hundred milliseconds and a terrible
+ * Interaction to Next Paint (INP) for this interaction.
  * CWV-FIX: move the heavy computation off the critical path — chunk it across
  * frames (setTimeout / requestIdleCallback / scheduler.yield), offload it to a
  * Web Worker, or precompute/memoize the result so the click handler returns
  * almost immediately and the UI stays responsive.
  */
-export default function HeavyButton() {
+export default function PackCalculator() {
   const [score, setScore] = useState<number | null>(null);
   const [running, setRunning] = useState(false);
 
-  function computeDifficulty() {
+  function computeLoad() {
     setRunning(true);
 
     // Synchronous, main-thread-blocking busy work. This is the whole point.
@@ -33,17 +33,18 @@ export default function HeavyButton() {
   }
 
   return (
-    <div className="card" style={{ marginBottom: "1.5rem" }}>
-      <h3>Trip difficulty estimator</h3>
+    <div className="card">
+      <h3>Base-weight calculator</h3>
       <p className="muted" style={{ marginBottom: "1rem" }}>
-        Crunches terrain, elevation, and weather data to score your planned route.
+        Crunches your gear list, food, and water against terrain and trip length
+        to estimate a recommended base weight for your pack.
       </p>
-      <button className="button" onClick={computeDifficulty} disabled={running}>
-        {running ? "Calculating…" : "Estimate difficulty"}
+      <button className="button" onClick={computeLoad} disabled={running}>
+        {running ? "Calculating…" : "Calculate pack load"}
       </button>
       {score !== null && (
         <p style={{ marginTop: "1rem" }}>
-          Estimated difficulty: <strong>{score} / 100</strong>
+          Recommended base weight: <strong>{score} kg</strong>
         </p>
       )}
     </div>
