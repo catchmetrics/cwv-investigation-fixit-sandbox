@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import Script from "next/script";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -25,6 +26,24 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
+        {/* CatchMetrics RUM — loads as early as possible to capture LCP/TTFB.
+            Reports to the staging platform; tagKey identifies this domain. */}
+        <Script id="catchmetrics-rum" strategy="beforeInteractive">
+          {`(function () {
+    var apiKey = "Ip5mUwAgiPEZVv5ScqiiGMb5PxPwSkX6hjFF17akkngK9NSj5XsDcNlSLFyOBnhJ2R2x0DtNb49rc2We1i/OQpCkCXu4LLgCnDa7WcDMODFMxLO2DoMeEEJgJ/IiTSV43RfhK7lCNnzL3E+jZQoUEg/aKsAU4Sh2GduXeDPsQvkORVEiAruNgNT9S9oalU/e";
+    var options = { debug: false, privacyMode: false, spaMode: false, errorTracking: false };
+    var tag = document.createElement('script');
+    tag.src = "https://platform-staging.catchmetrics.io/tag/rumdata.js";
+    tag.async = true;
+    tag.crossOrigin = "anonymous";
+    tag.onload = function () {
+      if (window.catchMetrics && window.catchMetrics.init) {
+        window.catchMetrics.init(apiKey, options);
+      }
+    };
+    document.head.appendChild(tag);
+  })();`}
+        </Script>
         <header className="site-header">
           <span className="brand">▲ NorthPeak Outdoors</span>
           <nav className="site-nav">
