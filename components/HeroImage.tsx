@@ -5,27 +5,25 @@
  * how the image itself is rendered.
  */
 
+import Image from "next/image";
+
 export default function HeroImage() {
   return (
     <section className="hero">
       {/*
-        CWV-ISSUE[LCP]: The Largest Contentful Paint element is this hero image,
-        rendered with a plain <img> pointing at /hero.jpg — a genuinely heavy
-        (~5 MB, 2400x1400) unoptimized JPEG. It is NOT served through next/image,
-        so there is no automatic resizing, no modern format (AVIF/WebP), no
-        responsive srcset, and no width/height, and it is NOT marked priority /
-        preloaded — so it is discovered late and downloads slowly, wrecking LCP.
-        It ALSO has no width/height, so it contributes to CLS when it loads.
-        CWV-FIX: use next/image (<Image src="/hero.jpg" priority fill sizes=...>)
-        or, at minimum, add a <link rel="preload" as="image">, explicit
-        width/height to reserve space, fetchpriority="high", and replace the asset
-        with a properly compressed, correctly sized image.
+        Fixed (ADP-1762): the hero LCP element now renders through next/image with
+        explicit width/height, priority (preload + fetchpriority="high") and
+        responsive sizes — so it is discovered early, served as optimized
+        AVIF/WebP, and no longer shifts layout.
       */}
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
+      <Image
         className="hero-img"
         src="/hero.jpg"
         alt="A climber on a snow-covered ridge at sunrise"
+        width={2400}
+        height={1400}
+        priority
+        sizes="100vw"
       />
       <div className="hero-caption">
         <h1>Gear for the high places.</h1>
