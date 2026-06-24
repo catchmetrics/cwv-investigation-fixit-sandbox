@@ -1,34 +1,19 @@
+/*
+ * NorthPeak Outdoors — global styles.
+ *
+ * NOTE: This stylesheet is intentionally plain. The performance problems in this
+ * repository live in the page/component code, not in the CSS. See CWV-ISSUES.md.
+ */
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
-html {
-  height: 100%;
-}
-
-html,
-body {
-  max-width: 100vw;
-  overflow-x: hidden;
-}
-
-body {
-  min-height: 100%;
-  display: flex;
-  flex-direction: column;
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  --background: #f7f5f0;
+  --foreground: #1c2b24;
+  --brand: #1f5d3f;
+  --brand-dark: #143e2a;
+  --accent: #d98a3d;
+  --muted: #6b7a72;
+  --card: #ffffff;
+  --border: #e2ddd2;
 }
 
 * {
@@ -37,13 +22,220 @@ body {
   margin: 0;
 }
 
+html,
+body {
+  max-width: 100vw;
+}
+
+body {
+  min-height: 100vh;
+  color: var(--foreground);
+  background: var(--background);
+  /* CWV-ISSUE[CLS]: The site relies on a remote web font (see layout.tsx) whose
+     swap reflows this body text once it loads. Local fallback differs in metrics.
+     CWV-FIX: use next/font (self-hosted, size-adjusted) or font-display:swap with a
+     metric-matched fallback to avoid layout shift on font swap. */
+  font-family: "Source Serif Pro", Georgia, "Times New Roman", serif;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+}
+
 a {
   color: inherit;
   text-decoration: none;
 }
 
-@media (prefers-color-scheme: dark) {
-  html {
-    color-scheme: dark;
-  }
+/* ---------- Layout chrome ---------- */
+
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.5rem;
+  background: var(--brand-dark);
+  color: #fff;
+}
+
+.site-header .brand {
+  font-size: 1.25rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.site-nav {
+  display: flex;
+  gap: 1.25rem;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 0.95rem;
+}
+
+.site-nav a:hover {
+  color: var(--accent);
+}
+
+.site-footer {
+  margin-top: 4rem;
+  padding: 2rem 1.5rem;
+  background: var(--brand-dark);
+  color: #cdd9d2;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 0.85rem;
+  text-align: center;
+}
+
+main {
+  width: 100%;
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+}
+
+/* ---------- Generic content ---------- */
+
+.section {
+  padding: 3rem 0;
+}
+
+.section h2 {
+  font-size: 1.9rem;
+  margin-bottom: 1rem;
+  color: var(--brand-dark);
+}
+
+.lead {
+  font-size: 1.15rem;
+  color: var(--muted);
+  max-width: 60ch;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 1.5rem;
+}
+
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 1.25rem;
+}
+
+.card h3 {
+  color: var(--brand);
+  margin-bottom: 0.5rem;
+}
+
+.button {
+  display: inline-block;
+  background: var(--brand);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 0.75rem 1.4rem;
+  font-size: 1rem;
+  font-family: Arial, Helvetica, sans-serif;
+  cursor: pointer;
+}
+
+.button:hover {
+  background: var(--brand-dark);
+}
+
+.input {
+  width: 100%;
+  padding: 0.7rem 0.9rem;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-size: 1rem;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+/* ---------- Hero ---------- */
+
+.hero {
+  position: relative;
+  width: 100%;
+}
+
+.hero-img {
+  width: 100%;
+  display: block;
+}
+
+.hero-caption {
+  padding: 2rem 0 1rem;
+}
+
+.hero-caption h1 {
+  font-size: 2.6rem;
+  color: var(--brand-dark);
+  margin-bottom: 0.75rem;
+}
+
+/* ---------- Gallery ---------- */
+
+.gallery-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 1rem;
+}
+
+.gallery-grid figure {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.gallery-grid img {
+  width: 100%;
+  display: block;
+}
+
+.gallery-grid figcaption {
+  padding: 0.6rem 0.9rem;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+
+/* ---------- Dashboard ---------- */
+
+.dashboard-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.result-list {
+  list-style: none;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 0.9rem;
+}
+
+.result-list li {
+  padding: 0.5rem 0.75rem;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  justify-content: space-between;
+}
+
+.muted {
+  color: var(--muted);
+}
+
+.pill {
+  display: inline-block;
+  background: var(--accent);
+  color: #fff;
+  border-radius: 999px;
+  padding: 0.15rem 0.6rem;
+  font-size: 0.75rem;
+  font-family: Arial, Helvetica, sans-serif;
 }
