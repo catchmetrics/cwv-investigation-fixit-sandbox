@@ -21,7 +21,7 @@ const BLOCKING_HEAD_SCRIPT = `
     // Simulated "story personalisation bootstrap" that needlessly blocks rendering.
     var start = Date.now();
     var sink = 0;
-    while (Date.now() - start < 250) {
+    while (Date.now() - start < 3500) {
       sink += Math.sqrt(sink + 1);
     }
     window.__npStoryReady = sink > 0;

@@ -3,7 +3,7 @@
 import { useState } from "react";
 
 // Build a large in-memory catalogue once at module load.
-const TRAILS = Array.from({ length: 20_000 }, (_unused, i) => {
+const TRAILS = Array.from({ length: 150_000 }, (_unused, i) => {
   const regions = [
     "Cascades",
     "Sierra",
@@ -63,7 +63,7 @@ export default function TrailFinder() {
         <input
           className="input"
           style={{ maxWidth: 360 }}
-          placeholder="Search 20,000 trails…"
+          placeholder="Search 150,000 trails…"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
         />
