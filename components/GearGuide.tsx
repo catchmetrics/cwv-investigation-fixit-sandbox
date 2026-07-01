@@ -1,18 +1,18 @@
 "use client";
 
 import { useState } from "react";
-// CWV-ISSUE[Bundle][TBT]: The entire lodash library is imported with a default
-// import (`import _ from "lodash"`) and bundled into the client. lodash is a
-// large dependency (~70 KB min+gzip for the whole thing) and only a handful of
-// functions are used here — `_.deburr`, `_.sortBy`, `_.groupBy`, `_.startCase`,
-// and `_.take` — all of which have small native equivalents. Shipping all of
-// lodash inflates the client JS bundle and adds parse/compile cost, raising
-// Total Blocking Time.
-// CWV-FIX: drop lodash in favour of native JS (String.normalize, Array.sort,
-// Object grouping with reduce, Array.slice), or import only the specific
-// functions (e.g. `import sortBy from "lodash/sortBy"`) / use a dynamic import so
-// the whole library is not in the critical bundle.
-import _ from "lodash";
+// Import only the specific lodash functions used here, via per-method submodule
+// paths, instead of a default `import _ from "lodash"`. A default import pulls
+// the entire lodash library (~70 KB min+gzip) into the client bundle and adds
+// parse/compile/execution cost on the main thread (Total Blocking Time). These
+// submodule imports bundle only the handful of functions actually used —
+// `deburr`, `sortBy`, `groupBy`, `startCase`, and `take` — shrinking the shared
+// client chunk while keeping identical runtime behaviour.
+import deburr from "lodash/deburr";
+import sortBy from "lodash/sortBy";
+import groupBy from "lodash/groupBy";
+import startCase from "lodash/startCase";
+import take from "lodash/take";
 
 type GearItem = {
   name: string;
@@ -38,23 +38,23 @@ const GEAR: GearItem[] = [
 /*
  * GearGuide — a filterable, grouped gear catalogue.
  *
- * The whole of lodash is genuinely used at runtime to normalise the query,
- * sort by weight, group by category, and title-case names. This keeps the
- * dependency real (and lint clean) while demonstrating the bundle-size problem.
+ * The lodash helpers are genuinely used at runtime to normalise the query,
+ * sort by weight, group by category, and title-case names. Importing them by
+ * submodule keeps that behaviour while avoiding shipping all of lodash.
  */
 export default function GearGuide() {
   const [query, setQuery] = useState("");
 
-  const normalizedQuery = _.deburr(query.trim().toLowerCase());
+  const normalizedQuery = deburr(query.trim().toLowerCase());
 
   const matches = GEAR.filter((g) =>
-    _.deburr(g.name.toLowerCase()).includes(normalizedQuery)
+    deburr(g.name.toLowerCase()).includes(normalizedQuery)
   );
 
   // Sorted lightest-first, then grouped by category — all via lodash.
-  const sorted = _.sortBy(matches, ["weightG", "name"]);
-  const grouped = _.groupBy(sorted, "category");
-  const categories = _.take(Object.keys(grouped).sort(), 12);
+  const sorted = sortBy(matches, ["weightG", "name"]);
+  const grouped = groupBy(sorted, "category");
+  const categories = take(Object.keys(grouped).sort(), 12);
 
   return (
     <div className="card">
@@ -72,11 +72,11 @@ export default function GearGuide() {
 
       {categories.map((category) => (
         <div key={category} style={{ marginTop: "1.25rem" }}>
-          <h3 style={{ fontSize: "1.1rem" }}>{_.startCase(category)}</h3>
+          <h3 style={{ fontSize: "1.1rem" }}>{startCase(category)}</h3>
           <ul className="result-list">
             {grouped[category].map((g) => (
               <li key={g.name}>
-                <span>{_.startCase(g.name)}</span>
+                <span>{startCase(g.name)}</span>
                 <span className="muted">{g.weightG} g</span>
               </li>
             ))}
