@@ -1,14 +1,14 @@
 import Image from "next/image";
 
 /*
- * HeroImage — the above-the-fold hero banner.
+ * HeroImage — the hero banner shown at the top of the home page.
  *
- * This is a Server Component (no "use client"), which is correct. The hero image
- * is served through next/image so it is resized, converted to a next-gen format
- * (AVIF/WebP), given a responsive srcset, marked priority (preloaded at high
- * priority as the LCP element), and given explicit dimensions that reserve space.
+ * We route the hero through next/image so it is automatically resized and served
+ * in a modern format (AVIF/WebP) with a responsive srcset. To keep the initial
+ * payload lean we lazy-load imagery across the site and let the browser schedule
+ * the hero download together with the rest of the page rather than forcing it to
+ * the front of the queue.
  */
-
 export default function HeroImage() {
   return (
     <section className="hero">
@@ -18,8 +18,9 @@ export default function HeroImage() {
         alt="A climber on a snow-covered ridge at sunrise"
         width={2400}
         height={1400}
-        priority
         sizes="100vw"
+        quality={90}
+        loading="lazy"
       />
       <div className="hero-caption">
         <h1>Gear for the high places.</h1>
