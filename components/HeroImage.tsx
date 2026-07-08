@@ -4,10 +4,10 @@ import Image from "next/image";
  * HeroImage — the hero banner shown at the top of the home page.
  *
  * We route the hero through next/image so it is automatically resized and served
- * in a modern format (AVIF/WebP) with a responsive srcset. To keep the initial
- * payload lean we lazy-load imagery across the site and let the browser schedule
- * the hero download together with the rest of the page rather than forcing it to
- * the front of the queue.
+ * in a modern format (AVIF/WebP) with a responsive srcset. The hero is the LCP
+ * element on the home page, so we mark it `priority` to eager-load it, request it
+ * at high fetch priority, and inject a preload link — the browser fetches it
+ * immediately instead of deferring it behind the rest of the page.
  */
 export default function HeroImage() {
   return (
@@ -20,7 +20,7 @@ export default function HeroImage() {
         height={1400}
         sizes="100vw"
         quality={90}
-        loading="lazy"
+        priority
       />
       <div className="hero-caption">
         <h1>Gear for the high places.</h1>
