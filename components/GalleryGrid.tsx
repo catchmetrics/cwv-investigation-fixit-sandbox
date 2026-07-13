@@ -19,20 +19,22 @@ export default function GalleryGrid() {
       {PHOTOS.map((p) => (
         <figure key={p.src}>
           {/*
-            CWV-ISSUE[CLS][LCP]: Every gallery image is a plain <img> with NO
-            width/height attributes (and no CSS aspect-ratio), so the browser
-            cannot reserve space before each ~3.4 MB image loads. As each one
-            arrives, it expands its figure and shoves the rest of the grid around,
-            producing repeated layout shifts (CLS). The images are also
-            unoptimized full-resolution JPEGs loaded eagerly, which competes for
-            bandwidth and hurts LCP. They are not lazy-loaded either.
-            CWV-FIX: use next/image with explicit width/height (or fill + a sized
-            container), add loading="lazy" for below-the-fold images, set an
-            explicit width/height or aspect-ratio to reserve layout space, and
-            serve optimized/resized assets.
+            Explicit width/height give the browser an intrinsic aspect ratio, so
+            it reserves layout space before each photo loads. Combined with the
+            grid's `width: 100%` / auto height, the images scale responsively while
+            the reserved box stays fixed — the grid no longer reflows as photos
+            arrive (fixes CLS). Below-the-fold photos are lazy-loaded so they stop
+            competing for bandwidth with the initial render.
           */}
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={p.src} alt={p.caption} />
+          <img
+            src={p.src}
+            alt={p.caption}
+            width={1600}
+            height={1067}
+            loading="lazy"
+            decoding="async"
+          />
           <figcaption>{p.caption}</figcaption>
         </figure>
       ))}
