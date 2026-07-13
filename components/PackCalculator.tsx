@@ -19,10 +19,15 @@ export default function PackCalculator() {
   const [score, setScore] = useState<number | null>(null);
   const [running, setRunning] = useState(false);
 
-  function computeLoad() {
+  async function computeLoad() {
     setRunning(true);
 
-    // Synchronous, main-thread-blocking busy work. This is the whole point.
+    // Yield to the browser so the "Calculating…" state paints before the heavy
+    // work starts. This keeps the click interaction's next paint fast (good
+    // INP): the busy loop no longer runs on the interaction's critical path.
+    await new Promise((resolve) => setTimeout(resolve));
+
+    // Heavy work now runs after the interaction has already painted.
     let total = 0;
     for (let i = 0; i < 300_000_000; i++) {
       total += Math.sqrt(i) * 0.000001;
