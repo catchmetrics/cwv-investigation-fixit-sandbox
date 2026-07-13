@@ -20,31 +20,33 @@ export default function AdBanner() {
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
-    // Simulate an ad/announcement fetched after mount, then injected with no
-    // space reserved for it.
+    // Simulate an ad/announcement fetched after mount, then injected into the
+    // space already reserved for it.
     const t = setTimeout(() => setVisible(true), 1200);
     return () => clearTimeout(t);
   }, []);
 
-  if (!visible) {
-    // No reserved space: returns null until the content pops in and shoves the
-    // page down.
-    return null;
-  }
-
+  // Reserve the banner's height up front so revealing the content does not push
+  // the surrounding page down: the container occupies the same space whether or
+  // not the announcement has arrived yet.
   return (
     <div
       style={{
-        background: "var(--accent)",
+        background: visible ? "var(--accent)" : "transparent",
         color: "#fff",
         padding: "1.5rem",
         fontFamily: "Arial, Helvetica, sans-serif",
         textAlign: "center",
+        minHeight: "90px",
       }}
     >
-      <strong>Spring Restock Event —</strong> free shipping on orders over $120,
-      plus an extra 15% off all hardshell jackets through Sunday. Use code{" "}
-      <span className="pill">PEAK15</span> at checkout.
+      {visible ? (
+        <>
+          <strong>Spring Restock Event —</strong> free shipping on orders over $120,
+          plus an extra 15% off all hardshell jackets through Sunday. Use code{" "}
+          <span className="pill">PEAK15</span> at checkout.
+        </>
+      ) : null}
     </div>
   );
 }
