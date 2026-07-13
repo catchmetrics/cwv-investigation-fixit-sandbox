@@ -20,7 +20,7 @@
  * self-hosts the font and removes the extra round-trips and the swap shift.
  */
 const FONT_HREF =
-  "https://fonts.googleapis.com/css2?family=Source+Serif+Pro:wght@400;600;700";
+  "https://fonts.googleapis.com/css2?family=Source+Serif+Pro:wght@400;600;700&display=swap";
 
 const JOURNAL_FONT_CSS = `
   .journal-content {
@@ -31,6 +31,8 @@ const JOURNAL_FONT_CSS = `
 export default function JournalBlockingFont() {
   return (
     <>
+      <link rel="preconnect" href="https://fonts.googleapis.com" />
+      <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
       <link rel="stylesheet" href={FONT_HREF} />
       <style dangerouslySetInnerHTML={{ __html: JOURNAL_FONT_CSS }} />
     </>
