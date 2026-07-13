@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 // Build a large in-memory catalogue once at module load.
 const TRAILS = Array.from({ length: 150_000 }, (_unused, i) => {
@@ -45,16 +45,27 @@ function deburr(value: string): string {
 
 export default function TrailFinder() {
   const [query, setQuery] = useState("");
+  const [debouncedQuery, setDebouncedQuery] = useState("");
 
-  // Recomputed on every render (every keystroke), no memoization, native JS.
-  const normalizedQuery = deburr(query.trim().toLowerCase());
-  const matches = TRAILS.filter((t) =>
-    deburr(t.name.toLowerCase()).includes(normalizedQuery)
-  );
-  const sorted = [...matches].sort(
-    (a, b) => a.distanceKm - b.distanceKm || a.name.localeCompare(b.name)
-  );
-  const visible = sorted.slice(0, 100);
+  // Debounce the query so the heavy filter/sort runs at most once per pause in
+  // typing, not on every keystroke — the input stays responsive (good INP).
+  useEffect(() => {
+    const id = setTimeout(() => setDebouncedQuery(query), 200);
+    return () => clearTimeout(id);
+  }, [query]);
+
+  // Memoize the filtered/sorted result so it only recomputes when the debounced
+  // query changes, instead of scanning and sorting all trails on every render.
+  const { matches, visible } = useMemo(() => {
+    const normalizedQuery = deburr(debouncedQuery.trim().toLowerCase());
+    const matched = TRAILS.filter((t) =>
+      deburr(t.name.toLowerCase()).includes(normalizedQuery)
+    );
+    const sorted = [...matched].sort(
+      (a, b) => a.distanceKm - b.distanceKm || a.name.localeCompare(b.name)
+    );
+    return { matches: matched, visible: sorted.slice(0, 100) };
+  }, [debouncedQuery]);
 
   return (
     <div className="card">
