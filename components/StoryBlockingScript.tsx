@@ -1,33 +1,33 @@
 /*
- * StoryBlockingScript — a render-blocking inline <script> for the /story page.
+ * StoryBlockingScript — the /story "personalisation bootstrap".
  *
- * This is a Server Component that emits a synchronous inline <script> into the
- * document. Next.js hoists bare <script> elements rendered in the tree into the
- * document <head>, where this one runs synchronously before the page can paint.
+ * This is a Server Component that emits the bootstrap for the /story page. It is
+ * loaded through next/script with strategy="afterInteractive" so it runs AFTER the
+ * initial render instead of blocking it. It must not do synchronous main-thread
+ * work in the critical path.
  */
 
+import Script from "next/script";
+
 /*
- * CWV-ISSUE[LCP]: This synchronous inline <script> runs a pointless busy-loop on
- * the main thread before the browser can paint anything, directly delaying First
- * Contentful Paint and Largest Contentful Paint. It is a classic render-blocking
- * script in the critical path — and it lives ONLY on this route, so /story is the
- * only page that pays for it.
- * CWV-FIX: remove the busy-work entirely, or move this to next/script with
- * strategy="afterInteractive"/"lazyOnload" (or defer/async on a plain <script>)
- * so it no longer blocks the initial render.
+ * CWV-FIX[LCP]: previously this rendered a bare synchronous inline <script> that
+ * Next.js hoisted into <head> and ran a ~3.5s busy-loop before the browser could
+ * paint, delaying First Contentful Paint and the text Largest Contentful Paint on
+ * /story. The busy-work is removed and the bootstrap now loads via next/script
+ * with strategy="afterInteractive", so it no longer blocks the initial render.
  */
-const BLOCKING_HEAD_SCRIPT = `
+const STORY_BOOTSTRAP_SCRIPT = `
   (function () {
-    // Simulated "story personalisation bootstrap" that needlessly blocks rendering.
-    var start = Date.now();
-    var sink = 0;
-    while (Date.now() - start < 3500) {
-      sink += Math.sqrt(sink + 1);
-    }
-    window.__npStoryReady = sink > 0;
+    // Story personalisation bootstrap — runs after the page is interactive, so it
+    // no longer blocks first paint / LCP.
+    window.__npStoryReady = true;
   })();
 `;
 
 export default function StoryBlockingScript() {
-  return <script dangerouslySetInnerHTML={{ __html: BLOCKING_HEAD_SCRIPT }} />;
+  return (
+    <Script id="np-story-bootstrap" strategy="afterInteractive">
+      {STORY_BOOTSTRAP_SCRIPT}
+    </Script>
+  );
 }
