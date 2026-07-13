@@ -1,12 +1,7 @@
-import Image from "next/image";
-
 /*
  * GalleryGrid — a grid of trip photos.
  *
- * Server Component (correct). Photos are served through next/image so they are
- * resized to their display size, converted to a next-gen format (AVIF/WebP),
- * given a responsive srcset, lazy-loaded (below the fold), and given explicit
- * dimensions that reserve layout space.
+ * Server Component (correct). The problem is the images themselves.
  */
 
 const PHOTOS = [
@@ -23,14 +18,21 @@ export default function GalleryGrid() {
     <div className="gallery-grid">
       {PHOTOS.map((p) => (
         <figure key={p.src}>
-          <Image
-            src={p.src}
-            alt={p.caption}
-            width={1800}
-            height={1200}
-            loading="lazy"
-            sizes="(max-width: 700px) 100vw, 320px"
-          />
+          {/*
+            CWV-ISSUE[CLS][LCP]: Every gallery image is a plain <img> with NO
+            width/height attributes (and no CSS aspect-ratio), so the browser
+            cannot reserve space before each ~3.4 MB image loads. As each one
+            arrives, it expands its figure and shoves the rest of the grid around,
+            producing repeated layout shifts (CLS). The images are also
+            unoptimized full-resolution JPEGs loaded eagerly, which competes for
+            bandwidth and hurts LCP. They are not lazy-loaded either.
+            CWV-FIX: use next/image with explicit width/height (or fill + a sized
+            container), add loading="lazy" for below-the-fold images, set an
+            explicit width/height or aspect-ratio to reserve layout space, and
+            serve optimized/resized assets.
+          */}
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={p.src} alt={p.caption} />
           <figcaption>{p.caption}</figcaption>
         </figure>
       ))}

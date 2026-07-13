@@ -162,10 +162,6 @@ main {
 .hero-img {
   width: 100%;
   display: block;
-  /* Reserve layout space before the image loads to prevent CLS. The hero asset
-     is 2400x1400, so lock that ratio; it matches the image's natural ratio, so
-     there is no distortion. */
-  aspect-ratio: 2400 / 1400;
 }
 
 .hero-caption {
@@ -196,10 +192,6 @@ main {
 .gallery-grid img {
   width: 100%;
   display: block;
-  /* Reserve layout space before each photo loads to prevent CLS. Lock a uniform
-     ratio for the grid; object-fit keeps photos from distorting to fit it. */
-  aspect-ratio: 3 / 2;
-  object-fit: cover;
 }
 
 .gallery-grid figcaption {

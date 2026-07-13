@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useState } from "react";
 
 // Build a large in-memory catalogue once at module load.
 const TRAILS = Array.from({ length: 150_000 }, (_unused, i) => {
@@ -45,26 +45,15 @@ function deburr(value: string): string {
 
 export default function TrailFinder() {
   const [query, setQuery] = useState("");
-  const [debouncedQuery, setDebouncedQuery] = useState("");
 
-  // Debounce the input so the expensive filter/sort runs only after typing
-  // pauses (200ms), instead of synchronously on every keystroke.
-  useEffect(() => {
-    const id = setTimeout(() => setDebouncedQuery(query), 200);
-    return () => clearTimeout(id);
-  }, [query]);
-
-  // Memoize the filtered/sorted result, keyed on the debounced query, so the
-  // full dataset is not re-scanned and re-sorted on every render.
-  const sorted = useMemo(() => {
-    const normalizedQuery = deburr(debouncedQuery.trim().toLowerCase());
-    const matches = TRAILS.filter((t) =>
-      deburr(t.name.toLowerCase()).includes(normalizedQuery)
-    );
-    return [...matches].sort(
-      (a, b) => a.distanceKm - b.distanceKm || a.name.localeCompare(b.name)
-    );
-  }, [debouncedQuery]);
+  // Recomputed on every render (every keystroke), no memoization, native JS.
+  const normalizedQuery = deburr(query.trim().toLowerCase());
+  const matches = TRAILS.filter((t) =>
+    deburr(t.name.toLowerCase()).includes(normalizedQuery)
+  );
+  const sorted = [...matches].sort(
+    (a, b) => a.distanceKm - b.distanceKm || a.name.localeCompare(b.name)
+  );
   const visible = sorted.slice(0, 100);
 
   return (
@@ -78,7 +67,7 @@ export default function TrailFinder() {
           value={query}
           onChange={(e) => setQuery(e.target.value)}
         />
-        <span className="muted">{sorted.length.toLocaleString()} matches</span>
+        <span className="muted">{matches.length.toLocaleString()} matches</span>
       </div>
       <ul className="result-list">
         {visible.map((t) => (

@@ -1,25 +1,14 @@
 import HeroImage from "@/components/HeroImage";
-import HomeIntroScript from "@/components/HomeIntroScript";
-import HomeHeadlineFont from "@/components/HomeHeadlineFont";
 
 /*
- * Home page — dominant metric: LCP.
+ * Home page — dominant problem: LCP.
  *
- * The homepage carries THREE distinct Largest-Contentful-Paint problems, each in its
- * own component so it can be fixed independently:
- *   1. HeroImage        — the LCP element is a heavy, unoptimized <img> (no next/image,
- *                         no priority/preload) so it is discovered late and paints slowly.
- *   2. HomeIntroScript  — a synchronous render-blocking inline <script> in <head> that
- *                         busy-loops before the hero can paint.
- *   3. HomeHeadlineFont — a remote headline font loaded with no preconnect and no
- *                         display=swap, blocking the above-the-fold headline paint.
- * Everything else here is plain, well-behaved content.
+ * The single intentional issue on this route is the heavy, unoptimized hero
+ * <img> (see HeroImage). Everything else here is plain, well-behaved content.
  */
 export default function Home() {
   return (
     <main>
-      <HomeIntroScript />
-      <HomeHeadlineFont />
       <HeroImage />
 
       <section className="section">

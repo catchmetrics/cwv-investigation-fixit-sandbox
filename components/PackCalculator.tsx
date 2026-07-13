@@ -19,23 +19,13 @@ export default function PackCalculator() {
   const [score, setScore] = useState<number | null>(null);
   const [running, setRunning] = useState(false);
 
-  async function computeLoad() {
+  function computeLoad() {
     setRunning(true);
 
-    // Same computation as before, but chunked across event-loop turns so it no
-    // longer runs as one long, main-thread-blocking task. Each chunk is short,
-    // and we yield to the browser between chunks so it can paint and handle
-    // input — keeping INP low while producing an identical result.
+    // Synchronous, main-thread-blocking busy work. This is the whole point.
     let total = 0;
-    const TOTAL = 300_000_000;
-    const CHUNK = 5_000_000;
-    for (let start = 0; start < TOTAL; start += CHUNK) {
-      const end = Math.min(start + CHUNK, TOTAL);
-      for (let i = start; i < end; i++) {
-        total += Math.sqrt(i) * 0.000001;
-      }
-      // Yield to the event loop so the main thread stays responsive.
-      await new Promise((resolve) => setTimeout(resolve));
+    for (let i = 0; i < 300_000_000; i++) {
+      total += Math.sqrt(i) * 0.000001;
     }
 
     setScore(Math.round((total % 100) * 10) / 10);

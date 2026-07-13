@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useDeferredValue, useMemo } from "react";
+import { useState } from "react";
 // CWV-ISSUE[Bundle][TBT]: The entire lodash library is imported with a default
 // import (`import _ from "lodash"`) and bundled into the client. lodash is a
 // large dependency (~70 KB min+gzip for the whole thing) and only a handful of
@@ -45,29 +45,16 @@ const GEAR: GearItem[] = [
 export default function GearGuide() {
   const [query, setQuery] = useState("");
 
-  // CWV-FIX[INP]: keep the input update urgent (the controlled value below stays
-  // bound to `query` so typing is instant) but defer the expensive filter/sort/
-  // group/format pipeline. `useDeferredValue` lets React render the keystroke
-  // first — the memo returns the cached result for the previous deferred query,
-  // so the urgent render is cheap — then recompute the heavy list in a
-  // low-priority background pass. This takes the per-keystroke lodash processing
-  // off the interaction's critical path, cutting INP.
-  const deferredQuery = useDeferredValue(query);
+  const normalizedQuery = _.deburr(query.trim().toLowerCase());
 
-  const { categories, grouped, matchCount } = useMemo(() => {
-    const normalizedQuery = _.deburr(deferredQuery.trim().toLowerCase());
+  const matches = GEAR.filter((g) =>
+    _.deburr(g.name.toLowerCase()).includes(normalizedQuery)
+  );
 
-    const matches = GEAR.filter((g) =>
-      _.deburr(g.name.toLowerCase()).includes(normalizedQuery)
-    );
-
-    // Sorted lightest-first, then grouped by category — all via lodash.
-    const sorted = _.sortBy(matches, ["weightG", "name"]);
-    const grouped = _.groupBy(sorted, "category");
-    const categories = _.take(Object.keys(grouped).sort(), 12);
-
-    return { categories, grouped, matchCount: matches.length };
-  }, [deferredQuery]);
+  // Sorted lightest-first, then grouped by category — all via lodash.
+  const sorted = _.sortBy(matches, ["weightG", "name"]);
+  const grouped = _.groupBy(sorted, "category");
+  const categories = _.take(Object.keys(grouped).sort(), 12);
 
   return (
     <div className="card">
@@ -80,7 +67,7 @@ export default function GearGuide() {
           value={query}
           onChange={(e) => setQuery(e.target.value)}
         />
-        <span className="muted">{matchCount} items</span>
+        <span className="muted">{matches.length} items</span>
       </div>
 
       {categories.map((category) => (
