@@ -1,15 +1,20 @@
 import HeroImage from "@/components/HeroImage";
+import ErrorScenarios from "@/components/ErrorScenarios";
 
 /*
  * Home page — dominant problem: LCP.
  *
  * The single intentional issue on this route is the heavy, unoptimized hero
  * <img> (see HeroImage). Everything else here is plain, well-behaved content.
+ *
+ * ErrorScenarios fires a set of realistic JS errors for testing
+ * CatchMetrics error tracking and source-map symbolication.
  */
 export default function Home() {
   return (
     <main>
       <HeroImage />
+      <ErrorScenarios />
 
       <section className="section">
         <h2>Why NorthPeak</h2>
