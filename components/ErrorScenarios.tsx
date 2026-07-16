@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef } from "react";
 
 /*
  * ErrorScenarios — deliberately triggers realistic JavaScript errors.
@@ -48,11 +48,11 @@ function processCartItems(items: unknown) {
 }
 
 export default function ErrorScenarios() {
-  const [mounted, setMounted] = useState(false);
+  const firedRef = useRef(false);
 
   useEffect(() => {
-    if (mounted) return;
-    setMounted(true);
+    if (firedRef.current) return;
+    firedRef.current = true;
 
     // 1. TypeError — null dereference deep in a call chain (very common)
     setTimeout(() => {
@@ -96,7 +96,7 @@ export default function ErrorScenarios() {
       const pageSize = -1; // bug: negative page size from query param
       new Array(pageSize);
     }, 5600);
-  }, [mounted]);
+  }, []);
 
   return null;
 }
